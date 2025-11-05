@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const movieController = require("../controllers/movie.controller.js");
-const authenticateToken = require("../middleware/auth.js");
+const { authenticateToken, authorizeRole } = require("../middleware/auth.js");
 
 // Routes for Movies
 router.get("/", movieController.getAllMovies);

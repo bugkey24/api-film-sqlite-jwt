@@ -44,7 +44,7 @@ exports.register = (req, res) => {
   });
 };
 
-// POST /auth/register-admin (BARU)
+// POST /auth/register-admin
 exports.registerAdmin = (req, res) => {
   const { username, password } = req.body;
 
@@ -59,7 +59,6 @@ exports.registerAdmin = (req, res) => {
       return res.status(500).json({ error: "Failed to process registration" });
     }
 
-    // SQL ini memasukkan peran 'admin'
     const sql = "INSERT INTO users (username, password, role) VALUES (?,?,?)";
     const params = [username.toLowerCase(), hashedPassword, "admin"];
 
