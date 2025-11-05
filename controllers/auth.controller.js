@@ -23,8 +23,8 @@ exports.register = (req, res) => {
       return res.status(500).json({ error: "Failed to process registration" });
     }
 
-    const sql = "INSERT INTO users (username, password) VALUES (?,?)";
-    const params = [username.toLowerCase(), hashedPassword];
+    const sql = "INSERT INTO users (username, password, role) VALUES (?,?,?)";
+    const params = [username.toLowerCase(), hashedPassword, "user"];
 
     db.run(sql, params, function (err) {
       if (err) {
@@ -38,6 +38,43 @@ exports.register = (req, res) => {
 
       res.status(201).json({
         message: "Registration successful",
+        userId: this.lastID,
+      });
+    });
+  });
+};
+
+// POST /auth/register-admin (BARU)
+exports.registerAdmin = (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password || password.length < 6) {
+    return res.status(400).json({
+      error: "Username and password (min 6 char) are required",
+    });
+  }
+
+  bcrypt.hash(password, 10, (err, hashedPassword) => {
+    if (err) {
+      return res.status(500).json({ error: "Failed to process registration" });
+    }
+
+    // SQL ini memasukkan peran 'admin'
+    const sql = "INSERT INTO users (username, password, role) VALUES (?,?,?)";
+    const params = [username.toLowerCase(), hashedPassword, "admin"];
+
+    db.run(sql, params, function (err) {
+      if (err) {
+        if (err.message.includes("UNIQUE constraint")) {
+          return res
+            .status(409)
+            .json({ error: "Admin username already taken" });
+        }
+        return res.status(500).json({ error: "Failed to save admin user" });
+      }
+
+      res.status(201).json({
+        message: "Admin created successfully",
         userId: this.lastID,
       });
     });
@@ -72,6 +109,7 @@ exports.login = (req, res) => {
         user: {
           id: user.id,
           username: user.username,
+          role: user.role,
         },
       };
 

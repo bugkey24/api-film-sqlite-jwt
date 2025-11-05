@@ -57,6 +57,7 @@ const db = new sqlite3.Database(DB_SOURCE, (err) => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL
+            role TEXT NOT NULL DEFAULT 'user'
         )`,
         (err) => {
           if (err) {
